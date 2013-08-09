@@ -1,0 +1,38 @@
+#!/bin/bash
+
+### Shell script that creates a tarball from a git repo of a bunch of
+### configurations and extracts each of them in respective the debian
+### package directory.
+
+SCRIPTNAME=${0##*/}
+
+## Check the args.
+if [ $# -ne 1 ]; then
+    echo "Usage: $SCRIPTNAME <nginx version>"
+    exit 1
+fi
+
+## The configs to be packaged directory.
+NGINX_CONFIGS_DIR=$HOME/nginx-config/github
+[ -d $NGINX_CONFIGS_DIR ] || exit 0
+
+## The Nginx source dir. The argument $1 is the Nginx version.
+NGINX_SOURCE_DIR=$HOME/C/nginx/nginx-$1
+[ -d $NGINX_SOURCE_DIR ] || exit 0
+
+## CDing to the Nginx configurations dir.
+CURRENT_DIR=$(pwd)
+cd $NGINX_CONFIGS_DIR
+
+## Getting the tarballs and extracting it to the corresponding config
+## dir of the debian package.
+for d in $(ls -D); do
+    cd $d
+    ARCH_NAME=nginx_$d.tar.gz
+    git archive HEAD | gzip > $ARCH_NAME
+    tar zxvf $ARCH_NAME -C $NGINX_SOURCE_DIR/debian/help/examples/$d --exclude=.gitignore
+    cd ..
+done
+
+## Going back to original dir.
+cd $CURRENT_DIR

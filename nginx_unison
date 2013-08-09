@@ -1,0 +1,18 @@
+#!/bin/bash
+
+### Shell script that uses unison to synchronize Nginx source trees on
+### both my machine and ciconia.
+
+SCRIPTNAME=${0##*/}
+
+UNISON=$(which unison)
+[ -x $UNISON ] || exit 0
+
+## Check the args.
+if [ $# -ne 1 ]; then
+  echo "Usage: $SCRIPTNAME <nginx version>"
+  exit 1
+fi
+
+## Synchronizing both paths.
+$UNISON /home/appa/C/nginx/nginx-$1 ssh://perusio@ciconia.perusio.net//home/perusio/C/nginx/nginx-$1 -sshargs "-p 330" -ignore "Path .git"

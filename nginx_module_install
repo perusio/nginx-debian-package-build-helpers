@@ -1,0 +1,82 @@
+#!/bin/bash
+
+### This script gets a given module for the nginx debian package build.
+
+SCRIPTNAME=${0##*/}
+
+## Usage.
+function print_usage() {
+    echo "$SCRIPTNAME <nginx-version> <module directory>"
+}
+
+## Post processes a given module.
+function post_process_module() {
+    local temp_file=temp_conf.txt
+
+    case $1 in
+        lua-nginx-module)
+            rm -fr util
+            echo 'LUAJIT_INC="/usr/include/luajit-2.0"' >> $temp_file
+            echo 'LUAJIT_LIB="/usr/lib/$(dpkg-architecture -qDEB_HOST_GNU_TYPE)/libluajit-5.1.so.2.0.0"' >> $temp_file
+            cat $temp_file config > "0$temp_file"
+            mv "0$temp_file" config
+            [ -f $temp_file ] && rm $temp_file
+            ;;
+        nginx-sticky-module)
+            rm -fr docs
+            ;;
+        ngx_devel_kit)
+            rm -fr examples
+            ;;
+        nginx-upload-progress-module)
+            rm -fr test
+            ;;
+    esac
+} # post_process_module
+
+## Check the number of arguments.
+if [ $# -ne 2 ]; then
+    print_usage
+    exit 1
+fi
+
+## The Nginx source dir. The argument $1 is the Nginx version.
+NGINX_SOURCE_DIR=$HOME/C/nginx/nginx-$1
+[ -d $NGINX_SOURCE_DIR ] || exit 0
+
+## Copying the module to the Nginx build modules directory.
+NGINX_MODULES_DIR=$NGINX_SOURCE_DIR/modules
+[ -d $NGINX_MODULES_DIR ] || mkdir $NGINX_MODULES_DIR
+
+CURR_DIR=$(pwd)
+
+## The module directory.
+MODULE_DIR=$HOME/C/nginx/$2
+[ -d $MODULE_DIR ] || exit 0
+
+## Using git or svn to get the latest source.
+cd $MODULE_DIR
+GIT=$(command -v git) || exit 0
+SVN=$(command -v svn) || exit 0
+
+([ -d .git ] && $GIT pull) || ([ -d .svn ] && $SVN update)
+
+## The destination directory.
+DEST_DIR=$NGINX_MODULES_DIR/$2
+
+## Create the module directory.
+[ -d $DEST_DIR ] || mkdir $DEST_DIR
+
+## Copying the files.
+for i in $(ls); do
+    cp -a $i $DEST_DIR
+done
+
+## Post process a module.
+cd $DEST_DIR
+post_process_module $2
+
+## Return to the original directory.
+cd $CURR_DIR
+
+echo "Module installed in $DEST_DIR."

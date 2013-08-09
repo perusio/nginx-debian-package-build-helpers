@@ -1,0 +1,42 @@
+#!/bin/bash
+
+### Install all auxiliary scripts for my Nginx package.
+
+SCRIPTNAME=${0##*/}
+
+## Check the args.
+if [ $# -ne 1 ]; then
+    echo "Usage: $SCRIPTNAME <nginx version>"
+    exit 1
+fi
+
+## The directories with the scripts.
+NGINX_SCRIPTS_DIR=$HOME/shell/nginx-ensite
+
+## The Nginx source dir. The argument $1 is the Nginx version.
+NGINX_SOURCE_DIR=$HOME/C/nginx/nginx-$1
+[ -d $NGINX_SOURCE_DIR ] || exit 0
+
+## The destination directory.
+DEST_DIR=$NGINX_SOURCE_DIR/debian
+[ -d $DEST_DIR ] || exit 0
+
+## Update the scripts.
+cd $NGINX_SCRIPTS_DIR
+GIT=$(command -v git) || exit 0
+([ -d .git ] && $GIT pull)
+
+## The files to copy.
+SCRIPT_FILES=(
+    man/nginx_dissite.8
+    man/nginx_ensite.8
+    man/nginx_ensite.8.ronn
+    nginx_ensite
+)
+
+for f in ${SCRIPT_FILES[@]}; do
+    cp $f $DEST_DIR
+done
+
+## The completion helper needs to be handled differently.
+cp -a bash_completion.d $DEST_DIR
