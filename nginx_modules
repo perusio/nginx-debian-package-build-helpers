@@ -22,7 +22,7 @@ MODULES_BUILD=(
     'ngx_devel_kit'
 )
 
-INSTALL_SCRIPT=$HOME/shell/debian/nginx_module_install
+INSTALL_SCRIPT=$(dirname $0)/nginx_module_install
 [ -x $INSTALL_SCRIPT ] || exit 0
 
 for m in ${MODULES_BUILD[@]}; do
