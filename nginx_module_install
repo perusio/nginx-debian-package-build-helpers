@@ -40,8 +40,11 @@ if [ $# -ne 2 ]; then
     exit 1
 fi
 
+## Source the variable definitions.
+. vars.sh
+
 ## The Nginx source dir. The argument $1 is the Nginx version.
-NGINX_SOURCE_DIR=$HOME/C/nginx/nginx-$1
+NGINX_SOURCE_DIR=$NGINX_BASE_DIR/nginx-$1
 [ -d $NGINX_SOURCE_DIR ] || exit 0
 
 ## Copying the module to the Nginx build modules directory.

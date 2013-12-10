@@ -3,28 +3,24 @@
 SCRIPTNAME=${0##*/}
 
 function print_usage() {
-    echo "$SCRIPTNAME <nginx version>."
+    echo "$SCRIPTNAME <nginx version> [module_list]"
 }
 
-if [ $# -ne 1 ]; then
+if [ $# -lt 1 ]; then
     print_usage
     exit 1
 fi
 
-## The modules to be included in the build.
-MODULES_BUILD=(
-    'nginx-upstream-fair'
-    'nginx-sticky-module'
-    'lua-nginx-module'
-    'nginx-upload-progress-module'
-    'ngx_http_auth_request_module'
-    'ngx_http_delay_module'
-    'ngx_devel_kit'
-)
-
 INSTALL_SCRIPT=$(dirname $0)/nginx_module_install
 [ -x $INSTALL_SCRIPT ] || exit 0
 
-for m in ${MODULES_BUILD[@]}; do
-    $INSTALL_SCRIPT $1 $m
+MODULE_LIST=${2-module_list.txt}
+
+## Read the module list from a file.
+while read m; do
+    ## Skip all comment lines.
+    skip=$(echo $m | awk '/^#.*$'/ {print "skip"}')
+    ## Process each listed module.
+    test -z $skip && $INSTALL_SCRIPT $1 $m
 done
+
