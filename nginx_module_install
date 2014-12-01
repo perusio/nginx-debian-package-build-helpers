@@ -41,7 +41,7 @@ if [ $# -ne 2 ]; then
 fi
 
 ## Source the variable definitions.
-. vars.sh
+. $(dirname $0)/vars.sh
 
 ## The Nginx source dir. The argument $1 is the Nginx version.
 NGINX_SOURCE_DIR=$NGINX_BASE_DIR/nginx-$1
