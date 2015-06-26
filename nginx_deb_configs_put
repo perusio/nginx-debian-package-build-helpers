@@ -6,21 +6,28 @@
 
 SCRIPTNAME=${0##*/}
 
-## Check the args.
-if [ $# -ne 1 ]; then
-    echo "Usage: $SCRIPTNAME <nginx version>"
+function print_usage() {
+    echo "$SCRIPTNAME [install directory] [configs source directory]"
+}
+
+## Check the number of arguments.
+if [ $# -gt 2 ]; then
+    print_usage
     exit 1
 fi
 
 ## The configs to be packaged directory.
-NGINX_CONFIGS_DIR=$HOME/nginx-config/github
+NGINX_CONFIGS_DIR=${2-$HOME/nginx-config/github}
 [ -d $NGINX_CONFIGS_DIR ] || exit 0
 
-## The Nginx source dir. The argument $1 is the Nginx version.
-NGINX_SOURCE_DIR=$HOME/C/nginx/nginx-$1
+## Source the variable definitions.
+. $(dirname $0)/vars.sh
+
+## The nginx source dir. The argument $1 is the nginx version.
+NGINX_SOURCE_DIR=${1-$NGINX_BASE_DIR/nginx-debian-package}/debian/help/examples
 [ -d $NGINX_SOURCE_DIR ] || exit 0
 
-## CDing to the Nginx configurations dir.
+## CDing to the nginx configurations dir.
 CURRENT_DIR=$(pwd)
 cd $NGINX_CONFIGS_DIR
 
@@ -30,7 +37,9 @@ for d in $(ls -D); do
     cd $d
     ARCH_NAME=nginx_$d.tar.gz
     git archive HEAD | gzip > $ARCH_NAME
-    tar zxvf $ARCH_NAME -C $NGINX_SOURCE_DIR/debian/help/examples/$d --exclude=.gitignore
+    OUTDIR=$NGINX_SOURCE_DIR/$d
+    test -d $OUTDIR || mkdir -p $OUTDIR
+    tar zxvf $ARCH_NAME -C $OUTDIR --exclude=.gitignore
     cd ..
 done
 

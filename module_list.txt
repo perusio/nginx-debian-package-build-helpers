@@ -1,8 +1,5 @@
 ## Nginx extra module list.
-nginx-upstream-fair
-nginx-sticky-module
 lua-nginx-module
 nginx-upload-progress-module
 ngx_http_delay_module
 ngx_devel_kit
-ngx_cache_purge

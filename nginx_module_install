@@ -4,20 +4,31 @@
 
 SCRIPTNAME=${0##*/}
 
+## pkg-config.
+PKGCONFIG=$(command -v pkg-config) || exit 0
+
 ## Usage.
 function print_usage() {
-    echo "$SCRIPTNAME <nginx-version> <module directory>"
+    echo "$SCRIPTNAME <module directory> <install base directory>"
 }
+
+## Check the number of arguments.
+if [ $# -ne 2 ]; then
+    print_usage
+    exit 1
+fi
 
 ## Post processes a given module.
 function post_process_module() {
-    local temp_file=temp_conf.txt
+    local temp_file=temp_conf.txt cflags ldflags
 
     case $1 in
         lua-nginx-module)
             rm -fr util
-            echo 'LUAJIT_INC="/usr/include/luajit-2.0"' >> $temp_file
-            echo 'LUAJIT_LIB="/usr/lib/$(dpkg-architecture -qDEB_HOST_GNU_TYPE)/libluajit-5.1.so.2.0.0"' >> $temp_file
+            cflags=$($PKGCONFIG --cflags luajit)
+            ldflags=$($PKGCONFIG ----libs-only-l --libs luajitl)
+            printf 'LUAJIT_INC="%s"\n' ${cflags#*I} >> $temp_file
+            printf 'LUAJIT_LIB="%s"\n' $ldflags >> $temp_file
             cat $temp_file config > "0$temp_file"
             mv "0$temp_file" config
             [ -f $temp_file ] && rm $temp_file
@@ -34,27 +45,17 @@ function post_process_module() {
     esac
 } # post_process_module
 
-## Check the number of arguments.
-if [ $# -ne 2 ]; then
-    print_usage
-    exit 1
-fi
-
 ## Source the variable definitions.
 . $(dirname $0)/vars.sh
 
-## The Nginx source dir. The argument $1 is the Nginx version.
-NGINX_SOURCE_DIR=$NGINX_BASE_DIR/nginx-$1
-[ -d $NGINX_SOURCE_DIR ] || exit 0
-
-## Copying the module to the Nginx build modules directory.
-NGINX_MODULES_DIR=$NGINX_SOURCE_DIR/modules
+## Copying the module to the nginx build modules directory.
+NGINX_MODULES_DIR=$2/debian/modules
 [ -d $NGINX_MODULES_DIR ] || mkdir $NGINX_MODULES_DIR
 
 CURR_DIR=$(pwd)
 
 ## The module directory.
-MODULE_DIR=$HOME/C/nginx/$2
+MODULE_DIR=$NGINX_BASE_DIR/$1
 [ -d $MODULE_DIR ] || exit 0
 
 ## Using git or svn to get the latest source.
@@ -65,7 +66,7 @@ SVN=$(command -v svn) || exit 0
 ([ -d .git ] && $GIT pull) || ([ -d .svn ] && $SVN update)
 
 ## The destination directory.
-DEST_DIR=$NGINX_MODULES_DIR/$2
+DEST_DIR=$NGINX_MODULES_DIR/$1
 
 ## Create the module directory.
 [ -d $DEST_DIR ] || mkdir $DEST_DIR
@@ -77,7 +78,7 @@ done
 
 ## Post process a module.
 cd $DEST_DIR
-post_process_module $2
+post_process_module $1
 
 ## Return to the original directory.
 cd $CURR_DIR

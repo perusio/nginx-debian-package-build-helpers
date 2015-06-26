@@ -4,17 +4,24 @@
 
 SCRIPTNAME=${0##*/}
 
-## Check the args.
-if [ $# -ne 1 ]; then
-    echo "Usage: $SCRIPTNAME <nginx version>"
+function print_usage() {
+    echo "$SCRIPTNAME [install directory] [nginx_ensite source directory]"
+}
+
+## Check the number of arguments.
+if [ $# -gt 2 ]; then
+    print_usage
     exit 1
 fi
 
 ## The directories with the scripts.
-NGINX_SCRIPTS_DIR=$HOME/shell/nginx-ensite
+NGINX_SCRIPTS_DIR=${2-$HOME/shell/nginx-ensite}
 
-## The Nginx source dir. The argument $1 is the Nginx version.
-NGINX_SOURCE_DIR=$HOME/C/nginx/nginx-$1
+## Source the variable definitions.
+. $(dirname $0)/vars.sh
+
+## The nginx source dir. The argument $1 is the nginx version.
+NGINX_SOURCE_DIR=${1-$NGINX_BASE_DIR/nginx-debian-package}
 [ -d $NGINX_SOURCE_DIR ] || exit 0
 
 ## The destination directory.
