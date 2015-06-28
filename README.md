@@ -15,7 +15,7 @@ The process relies on a couple of scripts I describe below.
  1. Clone the repository at https://github.com/perusio/nginx-debianization.
  2. To update the upstream run:
     
-    git-import-orig --uscan
+        git-import-orig --uscan
  3. Run the helper scripts below if **there are changes** to any of them:
 
         nginx_modules
