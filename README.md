@@ -121,6 +121,6 @@ The configurations are:
  * [Drupal](https://github.com/perusio/drupal-with-nginx)
  * [Wordpress](https://github.com/perusio/wordpress-nginx)
  * [Squirrelmail](https://github.com/perusio/squirrelmail-nginx)
- * [Chive]https://github.com/perusio/chive-nginx()
+ * [Chive](https://github.com/perusio/chive-nginx)
  * [Redmine](https://github.com/perusio/redmine-nginx)
- * [Piwik]()https://github.com/perusio/piwik-nginx
+ * [Piwik](https://github.com/perusio/piwik-nginx)
