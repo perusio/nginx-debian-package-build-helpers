@@ -23,7 +23,7 @@ The process relies on a couple of scripts I describe below.
         nginx_deb_configs_put
  4. Update the Debian changelog:
 
-        dch -v "$(git tag | cut -f 2 -d /)-perusio.1.0" "<changelog text>"
+        dch -v "$(git tag | cut -f 2 -d /)-perusio.1.0" "<changelog text>" -r 'unstable'
     If you want to change the *custom version* from `perusio.1.0` just
     change it to whatever you want. The changelog text is what you
     want to appear in the changelog for the new version. Note that
@@ -31,7 +31,7 @@ The process relies on a couple of scripts I describe below.
     package with a new upstream. Otherwise if it's just a new package
     version **without** a corresponding upstream just do:
     
-        dch "<changelog text>"
+        dch "<changelog text>" -r 'unstable'
  5. Go the debian package directory and commit the changed files in git.
  6. Build the package:
  
