@@ -26,7 +26,7 @@ function post_process_module() {
         lua-nginx-module)
             rm -fr util
             cflags=$($PKGCONFIG --cflags luajit)
-            ldflags=$($PKGCONFIG ----libs-only-l --libs luajitl)
+            ldflags=$($PKGCONFIG --libs-only-l --libs luajitl)
             printf 'LUAJIT_INC="%s"\n' ${cflags#*I} >> $temp_file
             printf 'LUAJIT_LIB="%s"\n' $ldflags >> $temp_file
             cat $temp_file config > "0$temp_file"
