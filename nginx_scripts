@@ -1,6 +1,6 @@
 #!/bin/bash
 
-### Install all auxiliary scripts for my Nginx package.
+### Install all auxiliary scripts for my nginx package.
 
 SCRIPTNAME=${0##*/}
 
@@ -18,7 +18,7 @@ fi
 NGINX_SCRIPTS_DIR=${2-$HOME/shell/nginx-ensite}
 
 ## Source the variable definitions.
-. $(dirname $0)/vars.sh
+. $(dirname $(realpath $SCRIPTNAME))/vars.sh
 
 ## The nginx source dir. The argument $1 is the nginx version.
 NGINX_SOURCE_DIR=${1-$NGINX_BASE_DIR/nginx-debian-package}
@@ -35,10 +35,10 @@ GIT=$(command -v git) || exit 0
 
 ## The files to copy.
 SCRIPT_FILES=(
-    man/nginx_dissite.8
-    man/nginx_ensite.8
-    man/nginx_ensite.8.ronn
-    nginx_ensite
+    share/man/man8/nginx_dissite.8
+    share/man/man8/nginx_ensite.8
+    doc/man/nginx_ensite.8.ronn
+    bin/nginx_ensite
 )
 
 for f in ${SCRIPT_FILES[@]}; do
