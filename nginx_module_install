@@ -60,8 +60,8 @@ MODULE_DIR=$NGINX_BASE_DIR/$1
 
 ## Using git or svn to get the latest source.
 cd $MODULE_DIR
+
 GIT=$(command -v git) || exit 0
-SVN=$(command -v svn) || exit 0
 
 ([ -d .git ] && $GIT pull) || ([ -d .svn ] && $SVN update)
 
